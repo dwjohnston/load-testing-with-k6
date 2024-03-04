@@ -1,6 +1,8 @@
 import { Todo } from "./Todo"
 import { v4 as uuidv4 } from 'uuid';
-import { Client } from 'pg'
+import {Client} from 'pg'; 
+
+
 
 export type Db = {
     getSingleTodo: (id: string) =>  Promise<Todo |null> ; 
@@ -35,7 +37,11 @@ type PostgresDbOptions = {
 }
 
 export async function createPostgresDb(options: PostgresDbOptions): Promise<Db> {
-    const client = new Client(options);
+
+
+    console.log(options.password)
+
+    const client = new Client({...options, });
 
     await client.connect();
 
