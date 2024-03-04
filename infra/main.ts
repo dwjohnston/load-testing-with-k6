@@ -351,26 +351,6 @@ class PostgresDB extends Construct {
       tags,
     });
 
-
-    const dbSecurityGroup2 = new SecurityGroup(
-      this,
-      `db-security-group-public`,
-      {
-        vpcId: Fn.tostring(vpc.vpcIdOutput),
-
-         ingress: [
-          // allow HTTP traffic from everywhere
-          {
-            protocol: "TCP",
-            fromPort: dbPort,
-            toPort: dbPort,
-            cidrBlocks: ["0.0.0.0/0"],
-            ipv6CidrBlocks: ["::/0"],
-          },
-        ],
-      }
-    );
-
     const password = new Password(this, "password", {length: 16}); 
 
     // Using this module: https://registry.terraform.io/modules/terraform-aws-modules/rds/aws/latest
@@ -398,8 +378,8 @@ class PostgresDB extends Construct {
 
       port: String(dbPort),
       username: `postgres`,
-      manageMasterUserPassword: false, 
       dbName: "postgres",
+      manageMasterUserPassword: false, 
       password: password.result, 
       skipFinalSnapshot: true, 
       
@@ -411,14 +391,11 @@ class PostgresDB extends Construct {
       // This is necessary due to a shortcoming in our token system to be adressed in
       // https://github.com/hashicorp/terraform-cdk/issues/651
       subnetIds: vpc.databaseSubnetsOutput as unknown as any,
-      vpcSecurityGroupIds: [dbSecurityGroup.id, dbSecurityGroup2.id],
+      vpcSecurityGroupIds: [dbSecurityGroup.id],
       dbSubnetGroupName: vpc.databaseSubnetGroupNameOutput, 
 
       tags,
-    });
-
-
-    
+    });  
 
     this.instance = db;
   }
@@ -504,7 +481,6 @@ class MyStack extends TerraformStack {
       vpc,
       cluster.cluster
     );
-
 
     const serviceSecurityGroup = new SecurityGroup(
       this,

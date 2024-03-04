@@ -18,9 +18,6 @@ export function createTodosApp(db: Db): Express {
         res.json(todos);
     });
 
-
-
-
     app.get('/todos/:id', async (req: Request, res: Response) => {
 
         const todo = await db.getSingleTodo(req.params.id);
